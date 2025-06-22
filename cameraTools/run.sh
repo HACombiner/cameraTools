@@ -1,3 +1,3 @@
 #!/bin/bash
-echo "Loaded."
+echo "HACombiner CameraTools Core Addon Installed And Loaded."
 tail -f /dev/null
