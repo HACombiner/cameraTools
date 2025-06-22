@@ -1,6 +1,6 @@
-name: HACombiner CameraTools Core (OLD REPO)
+name: HACombiner CameraTools Core
 version: "1.0"
-slug: HAC_CTC_OLD
+slug: HAC_CTC
 description: "HACombiner's CameraTools Core Addon."
 arch:
   - amd64
