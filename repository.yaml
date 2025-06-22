@@ -1,4 +1,4 @@
 # https://developers.home-assistant.io/docs/add-ons/repository#repository-configuration
-name: Stream related Home Assistant add-on repository
-url: 'https://github.com/allenporter/stream-addons'
-maintainer: Allen Porter <allen.porter@gmail.com>
+name: HACombiner CameraTools (OLD)
+url: 'https://hacombiner.github.io/cameratools'
+maintainer: NONE - OLD REPOSITORY - GO TO LINK TO UPGRADE
