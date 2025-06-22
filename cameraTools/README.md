@@ -1,3 +1,3 @@
-# Simple Logger Addon
+# HACombiner CameraTools Core Addon
 
-This addon prints "Loaded." to the logs when it starts.
+HACombiner's CameraTools Core Addon. This is not required downloaded but will be in the future. If you see this addon, you have successfully added the CameraTools addon repo. NOTE: This Is The OLD Repo.
