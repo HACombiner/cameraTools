@@ -1,8 +1,8 @@
-name: Sync Upstream Add-ons
+name: Upstream Add-on Sync
 
 on:
   schedule:
-    - cron: '0 3 * * *' # every day at 3am
+    - cron: '0 3 * * *'
   workflow_dispatch:
 
 jobs:
@@ -10,32 +10,39 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
-      - name: Sync webrtc add-on
+
+      - name: Sync go2rtc add-on from AlexxIT
         run: |
-          rm -rf webrtc
+          rm -rf go2rtc
           git clone --depth=1 https://github.com/AlexxIT/hassio-addons tmp
-          mv tmp/webrtc webrtc
+          mv tmp/go2rtc go2rtc || (echo "go2rtc folder not found!" && exit 1)
           rm -rf tmp
 
-      - name: Sync frigate add-on
+      - name: Sync rtsp-to-web add-on from Allen Porter
         run: |
-          rm -rf frigate
+          rm -rf rtsp-to-web
           git clone --depth=1 https://github.com/allenporter/stream-addons tmp
-          mv tmp/frigate frigate
+          mv tmp/rtsp-to-web rtsp-to-web || (echo "rtsp-to-web folder not found!" && exit 1)
+          rm -rf tmp
+
+      - name: Sync rtsp-to-webrtc add-on from Allen Porter
+        run: |
+          rm -rf rtsp-to-webrtc
+          git clone --depth=1 https://github.com/allenporter/stream-addons tmp
+          mv tmp/rtsp-to-webrtc rtsp-to-webrtc || (echo "rtsp-to-webrtc folder not found!" && exit 1)
           rm -rf tmp
 
       - name: Commit changes
         run: |
-          git config user.name "Your Bot"
-          git config user.email "bot@example.com"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           if ! git diff --quiet; then
             git checkout -b upstream-update-$(date +%s)
             git add .
             git commit -m "Update add-ons from upstream"
-            git push origin HEAD
+            git push -u origin HEAD
           else
-            echo "No changes to commit"
+            echo "No changes detected"
           fi
 
       - name: Create Pull Request
@@ -44,3 +51,5 @@ jobs:
           branch: upstream-auto-update
           title: "Update add-ons from upstream"
           body: "Automated sync of upstream Home Assistant add-ons"
+          labels: automated-pr
+          draft: false
