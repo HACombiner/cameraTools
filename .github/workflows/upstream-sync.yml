@@ -1,0 +1,46 @@
+name: Sync Upstream Add-ons
+
+on:
+  schedule:
+    - cron: '0 3 * * *' # every day at 3am
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Sync webrtc add-on
+        run: |
+          rm -rf webrtc
+          git clone --depth=1 https://github.com/AlexxIT/hassio-addons tmp
+          mv tmp/webrtc webrtc
+          rm -rf tmp
+
+      - name: Sync frigate add-on
+        run: |
+          rm -rf frigate
+          git clone --depth=1 https://github.com/allenporter/stream-addons tmp
+          mv tmp/frigate frigate
+          rm -rf tmp
+
+      - name: Commit changes
+        run: |
+          git config user.name "Your Bot"
+          git config user.email "bot@example.com"
+          if ! git diff --quiet; then
+            git checkout -b upstream-update-$(date +%s)
+            git add .
+            git commit -m "Update add-ons from upstream"
+            git push origin HEAD
+          else
+            echo "No changes to commit"
+          fi
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          branch: upstream-auto-update
+          title: "Update add-ons from upstream"
+          body: "Automated sync of upstream Home Assistant add-ons"
