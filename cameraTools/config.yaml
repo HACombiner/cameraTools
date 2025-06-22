@@ -1,0 +1,13 @@
+name: HACombiner CameraTools Core (OLD REPO)
+version: "1.0"
+slug: HAC_CTC_OLD
+description: "HACombiner's CameraTools Core Addon. This is not required downloaded but will be in the future. If you see this addon, you have successfully added the CameraTools addon repo. NOTE: This Is The OLD Repo."
+arch:
+  - amd64
+  - armv7
+  - armhf
+  - aarch64
+startup: application
+boot: auto
+options: {}
+schema: {}
