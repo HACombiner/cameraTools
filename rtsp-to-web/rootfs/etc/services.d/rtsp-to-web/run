@@ -1,0 +1,11 @@
+#!/usr/bin/with-contenv bashio
+# ==============================================================================
+# Start the RTSPtoWebRTC service
+# s6-overlay docs: https://github.com/just-containers/s6-overlay
+# ==============================================================================
+
+bashio::log.info "Starting discovery service"
+./discovery &
+
+bashio::log.info "Starting RSTPtoWeb"
+exec /app/rtsp-to-web --config /data/config.json

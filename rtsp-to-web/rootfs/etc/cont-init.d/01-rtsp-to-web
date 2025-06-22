@@ -1,0 +1,38 @@
+#!/usr/bin/with-contenv bashio
+#
+# Update the RTSPtoWeb configuration based on the currently defined options.
+# This is careful to preserve the existing config and only update the options
+# so that any existins streams are preserved.
+
+orig_config="/app/config.json"
+data_dir="/data"
+config="${data_dir}/config.json"
+
+if [ ! -f "${config}" ]; then
+    bashio::log.info "Creating configuration"
+    mkdir -p /data/
+    cp ${orig_config} ${config}
+else
+    bashio::log.info "Updating configuration"
+fi
+
+# Get latest options
+debug=$(bashio::config 'debug' 'false')
+log_level=$(bashio::config 'log_level' 'info')
+http_port=$(bashio::config 'http_port' '8083')
+rtsp_port=$(bashio::config 'rtsp_port' '5541')
+insecure_skip_verify=$(bashio::config 'insecure_skip_verify' 'false')
+
+
+# Rewrite the config file with latest options
+config_bak="${config}.bak"
+config_tmp="${config}.tmp"
+cp ${config} ${config_bak}
+cat ${config} \
+    | jq ".server.debug = ${debug}" \
+    | jq ".server.log_level = \"${log_level}\"" \
+    | jq ".server.http_port = \":${http_port}\"" \
+    | jq ".server.rtsp_port = \":${rtsp_port}\"" \
+    | jq ".channel_defaults.insecure_skip_verify = ${insecure_skip_verify}" \
+        > ${config_tmp}
+mv ${config_tmp} ${config}

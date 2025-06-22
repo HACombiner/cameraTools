@@ -1,0 +1,30 @@
+# https://developers.home-assistant.io/docs/add-ons/configuration#add-on-config
+name: RTSPtoWeb - WebRTC
+version: "1.4.0"
+slug: rtsp-to-web
+description: RTSP Stream to WebBrowser over WebRTC and other protocols based on Pion
+url: "https://github.com/allenporter/stream-addons/tree/main/rtsp-to-web"
+panel_icon: mdi:webrtc
+webui: "http://[HOST]:[PORT:8083]"
+host_network: true
+discovery: ["rtsp_to_webrtc"]
+arch:
+  - armhf
+  - armv7
+  - aarch64
+  - amd64
+  - i386
+options:
+  log_level: info
+  debug: false
+  http_port: 8083
+  rtsp_port: 5541
+  insecure_skip_verify: false
+schema:
+  debug: bool
+  http_port: int
+  rtsp_port: int
+  log_level: list(trace|debug|info|warn|error|fatal|panic)
+  insecure_skip_verify: bool
+init: false
+image: "ghcr.io/allenporter/{arch}-rtsp-to-web"
