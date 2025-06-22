@@ -1,55 +1,68 @@
-name: Upstream Add-on Sync
+name: Sync Add-ons Without Git CLI
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: '0 3 * * *'
-  workflow_dispatch:
 
 jobs:
-  sync:
+  sync-addons:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 
-      - name: Sync go2rtc add-on from AlexxIT
-        run: |
-          rm -rf go2rtc
-          git clone --depth=1 https://github.com/AlexxIT/hassio-addons tmp
-          mv tmp/go2rtc go2rtc || (echo "go2rtc folder not found!" && exit 1)
-          rm -rf tmp
+      - name: Fetch go2rtc addon files from AlexxIT
+        uses: actions/github-script@v6
+        id: fetch_go2rtc
+        with:
+          script: |
+            const files = [
+              'config.yaml',
+              'README.md',
+              'Dockerfile',
+              // add other files you want here
+            ];
+            const baseUrl = 'https://raw.githubusercontent.com/AlexxIT/hassio-addons/main/go2rtc/';
+            const fs = require('fs');
+            for (const file of files) {
+              const url = baseUrl + file;
+              const res = await fetch(url);
+              if (!res.ok) throw new Error(`Failed to fetch ${url}`);
+              const content = await res.text();
+              fs.mkdirSync('go2rtc', {recursive: true});
+              fs.writeFileSync(`go2rtc/${file}`, content);
+            }
 
-      - name: Sync rtsp-to-web add-on from Allen Porter
-        run: |
-          rm -rf rtsp-to-web
-          git clone --depth=1 https://github.com/allenporter/stream-addons tmp
-          mv tmp/rtsp-to-web rtsp-to-web || (echo "rtsp-to-web folder not found!" && exit 1)
-          rm -rf tmp
+      - name: Fetch rtsp-to-web addon files from Allen Porter
+        uses: actions/github-script@v6
+        id: fetch_rtsp_web
+        with:
+          script: |
+            const files = [
+              'config.yaml',
+              'README.md',
+              'Dockerfile',
+              // add other files here
+            ];
+            const baseUrl = 'https://raw.githubusercontent.com/allenporter/stream-addons/main/rtsp-to-web/';
+            const fs = require('fs');
+            for (const file of files) {
+              const url = baseUrl + file;
+              const res = await fetch(url);
+              if (!res.ok) throw new Error(`Failed to fetch ${url}`);
+              const content = await res.text();
+              fs.mkdirSync('rtsp-to-web', {recursive: true});
+              fs.writeFileSync(`rtsp-to-web/${file}`, content);
+            }
 
-      - name: Sync rtsp-to-webrtc add-on from Allen Porter
-        run: |
-          rm -rf rtsp-to-webrtc
-          git clone --depth=1 https://github.com/allenporter/stream-addons tmp
-          mv tmp/rtsp-to-webrtc rtsp-to-webrtc || (echo "rtsp-to-webrtc folder not found!" && exit 1)
-          rm -rf tmp
-
-      - name: Commit changes
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          if ! git diff --quiet; then
-            git checkout -b upstream-update-$(date +%s)
-            git add .
-            git commit -m "Update add-ons from upstream"
-            git push -u origin HEAD
-          else
-            echo "No changes detected"
-          fi
+      # Repeat for rtsp-to-webrtc similarly...
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
         with:
+          commit-message: 'Update add-ons from upstream repos'
           branch: upstream-auto-update
-          title: "Update add-ons from upstream"
-          body: "Automated sync of upstream Home Assistant add-ons"
+          title: 'Automated sync of Home Assistant add-ons'
+          body: |
+            This PR was created automatically by syncing upstream addon files.
           labels: automated-pr
-          draft: false
